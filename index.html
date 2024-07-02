@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>トーマの血球計算盤 濃度計算</title>
+    <title>トーマの血球計算盤 胞子濃度計算</title>
     <style>
         body {
             font-family: 'Arial', sans-serif;
@@ -73,10 +73,10 @@
     </style>
 </head>
 <body>
-    <h1>トーマの血球計算盤 濃度計算</h1>
+    <h1>トーマの血球計算盤 胞子濃度計算</h1>
     <form oninput="calculateConcentration()">
-        <label for="cellCount">数えた小ブロック内の細胞数:</label>
-        <input type="number" id="cellCount" name="cellCount" required>
+        <label for="sporeCount">数えた小ブロック内の胞子数:</label>
+        <input type="number" id="sporeCount" name="sporeCount" required>
         <label for="squareCount">数えた小ブロックの数:</label>
         <input type="number" id="squareCount" name="squareCount" value="1" required>
         <label for="dilutionFactor">希釈倍率:</label>
@@ -98,15 +98,15 @@
         let currentConcentration = 0;
 
         function calculateConcentration() {
-            const cellCount = parseFloat(document.getElementById('cellCount').value);
+            const sporeCount = parseFloat(document.getElementById('sporeCount').value);
             const squareCount = parseFloat(document.getElementById('squareCount').value);
             const dilutionFactor = parseFloat(document.getElementById('dilutionFactor').value);
             const result = document.getElementById('result');
 
-            if (isNaN(cellCount) || isNaN(squareCount) || isNaN(dilutionFactor)) {
+            if (isNaN(sporeCount) || isNaN(squareCount) || isNaN(dilutionFactor)) {
                 result.value = '有効な数値を入力してください';
             } else {
-                currentConcentration = (cellCount / squareCount) * 4000000 * dilutionFactor;
+                currentConcentration = (sporeCount / squareCount) * 4000000 * dilutionFactor;
                 result.innerHTML = toScientificNotation(currentConcentration);
             }
         }
@@ -137,22 +137,27 @@
 
                 if (sampleVolume < 1) {
                     const intermediateConcentration = currentConcentration / 10;
-                    sampleVolume = (1000 / (ratio / 10)).toFixed(1);
-                    diluentVolume = (1000 - sampleVolume).toFixed(1);
+                    const intermediateRatio = ratio / 10;
+                    const intermediateDilutionFactor = intermediateRatio.toFixed(2);
+                    let intermediateSampleVolume = Math.max(5, (1000 / intermediateRatio).toFixed(1));
+                    let intermediateDiluentVolume = (1000 - intermediateSampleVolume).toFixed(1);
                     method = `サンプル量が1 μL未満のため、2段階希釈を行います：<br>
-                              1. 中間希釈液の作成（100 μL）：<br>
-                                 a) 現在の溶液 ${sampleVolume} μLを取ります。<br>
-                                 b) 希釈液 ${diluentVolume} μLを加えます。<br>
-                                 c) 全量が100 μLになるようにします。<br>
+                              1. 中間希釈液の作成（1000 μL）：<br>
+                                 a) 現在の溶液を${intermediateDilutionFactor}倍に希釈してください。<br>
+                                 b) 現在の溶液 ${intermediateSampleVolume} μLを取ります。<br>
+                                 c) 滅菌水 ${intermediateDiluentVolume} μLを加えます。<br>
+                                 d) 全量が1000 μLになるようにします。このうち100 μLを最終希釈に利用します。<br>
+                              <br>
                               2. 最終希釈（1 mL）：<br>
-                                 a) 中間希釈液 100 μLを取ります。<br>
-                                 b) 希釈液 900 μLを加えます。<br>
-                                 c) 全量が1000 μL（1 mL）になるようにします。`;
+                                 a) 中間希釈液を10倍に希釈してください。<br>
+                                 b) 中間希釈液 100 μLを取ります。<br>
+                                 c) 滅菌水 900 μLを加えます。<br>
+                                 d) 全量が1000 μL（1 mL）になるようにします。`;
                 } else {
                     method = `現在の濃度を${dilutionFactor}倍に希釈してください。<br>
                               1 mLの最終溶液を作るには：<br>
                               1. 現在の溶液 ${sampleVolume} μLを取ります。<br>
-                              2. 希釈液 ${diluentVolume} μLを加えます。<br>
+                              2. 滅菌水 ${diluentVolume} μLを加えます。<br>
                               3. 全量が1000 μL（1 mL）になるようにします。`;
                 }
             }
