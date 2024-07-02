@@ -135,13 +135,13 @@
                 let sampleVolume = (1000 / ratio).toFixed(1);
                 let diluentVolume = (1000 - sampleVolume).toFixed(1);
 
-                if (sampleVolume < 1) {
-                    const intermediateConcentration = currentConcentration / 10;
-                    const intermediateRatio = ratio / 10;
+                if (parseFloat(sampleVolume) < 1) {
+                    const intermediateRatio = Math.sqrt(ratio);
                     const intermediateDilutionFactor = intermediateRatio.toFixed(2);
-                    let intermediateSampleVolume = Math.max(5, (1000 / intermediateRatio).toFixed(1));
+                    let intermediateSampleVolume = (1000 / intermediateRatio).toFixed(1);
                     let intermediateDiluentVolume = (1000 - intermediateSampleVolume).toFixed(1);
-                    method = `サンプル量が1 μL未満のため、2段階希釈を行います：<br>
+
+                    method = `サンプル量が1 μL未満のため、2段階希釈を行います：<br><br>
                               1. 中間希釈液の作成（1000 μL）：<br>
                                  a) 現在の溶液を${intermediateDilutionFactor}倍に希釈してください。<br>
                                  b) 現在の溶液 ${intermediateSampleVolume} μLを取ります。<br>
@@ -149,9 +149,9 @@
                                  d) 全量が1000 μLになるようにします。このうち100 μLを最終希釈に利用します。<br>
                               <br>
                               2. 最終希釈（1 mL）：<br>
-                                 a) 中間希釈液を10倍に希釈してください。<br>
-                                 b) 中間希釈液 100 μLを取ります。<br>
-                                 c) 滅菌水 900 μLを加えます。<br>
+                                 a) 中間希釈液を${intermediateDilutionFactor}倍に希釈してください。<br>
+                                 b) 中間希釈液 ${intermediateSampleVolume} μLを取ります。<br>
+                                 c) 滅菌水 ${intermediateDiluentVolume} μLを加えます。<br>
                                  d) 全量が1000 μL（1 mL）になるようにします。`;
                 } else {
                     method = `現在の濃度を${dilutionFactor}倍に希釈してください。<br>
