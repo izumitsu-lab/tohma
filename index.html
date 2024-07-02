@@ -136,23 +136,16 @@
                 let diluentVolume = (1000 - sampleVolume).toFixed(1);
 
                 if (parseFloat(sampleVolume) < 1) {
-                    const intermediateRatio = Math.sqrt(ratio);
-                    const intermediateDilutionFactor = intermediateRatio.toFixed(2);
-                    let intermediateSampleVolume = (1000 / intermediateRatio).toFixed(1);
-                    let intermediateDiluentVolume = (1000 - intermediateSampleVolume).toFixed(1);
-
-                    method = `サンプル量が1 μL未満のため、2段階希釈を行います：<br><br>
-                              1. 中間希釈液の作成（1000 μL）：<br>
-                                 a) 現在の溶液を${intermediateDilutionFactor}倍に希釈してください。<br>
-                                 b) 現在の溶液 ${intermediateSampleVolume} μLを取ります。<br>
-                                 c) 滅菌水 ${intermediateDiluentVolume} μLを加えます。<br>
-                                 d) 全量が1000 μLになるようにします。このうち100 μLを最終希釈に利用します。<br>
-                              <br>
-                              2. 最終希釈（1 mL）：<br>
-                                 a) 中間希釈液を${intermediateDilutionFactor}倍に希釈してください。<br>
-                                 b) 中間希釈液 ${intermediateSampleVolume} μLを取ります。<br>
-                                 c) 滅菌水 ${intermediateDiluentVolume} μLを加えます。<br>
-                                 d) 全量が1000 μL（1 mL）になるようにします。`;
+                    const adjustedSampleVolume = 5;
+                    const adjustedDiluentVolume = (adjustedSampleVolume * ratio - adjustedSampleVolume).toFixed(1);
+                    const totalVolume = (parseFloat(adjustedSampleVolume) + parseFloat(adjustedDiluentVolume)).toFixed(1);
+                    const totalVolumeML = (totalVolume / 1000).toFixed(2);
+                    const adjustedDiluentVolumeML = (adjustedDiluentVolume / 1000).toFixed(2);
+                    method = `1000倍以上の希釈となるため、より高い濃度で中間希釈液を作ることをおすすめします。<br><br>
+                              もし中間希釈液を作らない場合は、以下の手順に従ってください：<br>
+                              1. 現在の溶液 ${adjustedSampleVolume} μLを取ります。<br>
+                              2. 滅菌水 ${adjustedDiluentVolumeML} mL（${adjustedDiluentVolume} μL）を加えます。<br>
+                              3. 全量が${totalVolumeML} mL（${totalVolume} μL）になるようにします。`;
                 } else {
                     method = `現在の濃度を${dilutionFactor}倍に希釈してください。<br>
                               1 mLの最終溶液を作るには：<br>
